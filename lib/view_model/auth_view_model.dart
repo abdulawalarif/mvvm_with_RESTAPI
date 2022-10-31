@@ -1,8 +1,11 @@
+import 'package:asif_taj_rest_flutter/data/model/user_model.dart';
 import 'package:asif_taj_rest_flutter/repository/auth_repository.dart';
 import 'package:asif_taj_rest_flutter/utils/routes/routes_name.dart';
 import 'package:asif_taj_rest_flutter/utils/utils.dart';
+import 'package:asif_taj_rest_flutter/view_model/user_view_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
 
 class AuthViewModel with ChangeNotifier {
   final _myRepo = AuthRepository();
@@ -27,8 +30,16 @@ class AuthViewModel with ChangeNotifier {
     setLoading(true);
     _myRepo.loginApi(data).then((value) {
       setLoading(false);
+
+      final userPreference = Provider.of<UserViewModel>(context, listen: false);
+      userPreference.saveUser(UserModel(token: value['token'].toString()));
+
       Utils.flushBarErrorMessage('Login Successfully', context);
-      Navigator.pushNamed(context, RoutesName.home);
+      //Navigator.pushNamed(context, RoutesName.home);
+
+      Navigator.pushNamedAndRemoveUntil(
+          context, RoutesName.home, (Route<dynamic> route) => false);
+
       if (kDebugMode) {
         print(value.toString());
       }
